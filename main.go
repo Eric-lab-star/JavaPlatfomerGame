@@ -15,7 +15,10 @@ func main() {
 	fileSystem := os.DirFS(wd)
 	fs.WalkDir(fileSystem, ".", Compiler)
 	cmd := exec.Command("java", "-cp", "build", "main.Main")
-	cmd.Run()
+	err = cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func checkAny(err error) {
