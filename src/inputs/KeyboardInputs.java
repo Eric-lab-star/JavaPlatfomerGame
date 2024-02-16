@@ -3,11 +3,17 @@ package inputs;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import main.GamePanel;
+
 /**
  * KeyboardInputs
  */
 public class KeyboardInputs implements KeyListener {
-  public KeyboardInputs() {}
+  private GamePanel gamePanel;
+
+  public KeyboardInputs(GamePanel gamePanel) {
+    this.gamePanel = gamePanel;
+  }
 
   @Override
   public void keyTyped(KeyEvent e) {
@@ -23,16 +29,16 @@ public class KeyboardInputs implements KeyListener {
   public void keyReleased(KeyEvent e) {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_A:
-        System.out.println("key pressed A");
+        gamePanel.changeXDelta(-10);
         break;
       case KeyEvent.VK_S:
-        System.out.println("key pressed S");
+        gamePanel.changeYDelta(+10);
         break;
       case KeyEvent.VK_D:
-        System.out.println("key pressed D");
+        gamePanel.changeXDelta(+10);
         break;
       case KeyEvent.VK_W:
-        System.out.println("key pressed W");
+        gamePanel.changeYDelta(-10);
         break;
       default:
         break;
