@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/fs"
 	"log"
@@ -9,15 +10,17 @@ import (
 	"strings"
 )
 
+var runF = flag.Bool("Jrun", false, "build or run java file\n ")
+
 func main() {
+	flag.Parse()
 	wd, err := os.Getwd()
 	checkAny(err)
 	fileSystem := os.DirFS(wd)
 	fs.WalkDir(fileSystem, ".", Compiler)
-	cmd := exec.Command("java", "-cp", "build", "main.Main")
-	err = cmd.Run()
-	if err != nil {
-		log.Fatal(err)
+	if *runF {
+		cmd := exec.Command("java", "-cp", "build", "main.Main")
+		cmd.Run()
 	}
 }
 
