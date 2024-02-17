@@ -7,60 +7,28 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"strings"
-	"time"
-)
 
-var runF = flag.Bool("Jrun", false, "build or run java file\n ")
+	"github.com/eric-lab-star/platformerGame/utils"
+)
 
 func main() {
 	flag.Parse()
 	wd, err := os.Getwd()
-	fatalAny(err)
-	fileSystem := os.DirFS(wd)
-	fs.WalkDir(fileSystem, ".", Compiler)
-	if *runF {
-		cmd := exec.Command("java", "-cp", "build", "main.Main")
-		cmd.Run()
-	}
-}
-
-func fatalAny(err error) {
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("os.Getwd() from main function %v\n", err)
 	}
-}
 
-func Compiler(path string, d fs.DirEntry, err error) error {
-	err = shouldSkip(d.Name())
-	if err == fs.SkipDir {
-		return err
+	fileSystem := os.DirFS(wd)
+
+	fileStats := []utils.FileStatStruct{}
+
+	err = fs.WalkDir(fileSystem, "src", utils.HandleFile(&fileStats))
+	if err != nil {
+		fmt.Printf("walk dir err %v\n", err)
+		os.Exit(1)
 	}
-	if strings.Contains(path, ".java") {
-		saveInfo(path)
-		isModified(path)
-	}
-	return nil
-}
 
-func shouldSkip(dir string) error {
-	switch dir {
-	case ".git":
-		return fs.SkipDir
-	}
-	return nil
-}
-
-type fileStatStruct struct {
-	Name     string
-	Size     int64
-	ModeTime time.Time
-}
-
-func saveInfo(path string) {
-	fileStat, err := os.Stat(path)
-	fatalAny(err)
-	data := fileStatStruct{Name: fileStat.Name(), Size: fileStat.Size(), ModeTime: fileStat.ModTime()}
+	utils.WriteFileStat(fileStats)
 
 }
 
