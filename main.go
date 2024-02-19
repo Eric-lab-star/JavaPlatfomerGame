@@ -20,7 +20,6 @@ func main() {
 
 	newStats := []utils.FileStatStruct{}
 	fileSystem := os.DirFS(wd)
-	initStats := utils.UnmarshalJavaJsonFile()
 
 	err = fs.WalkDir(fileSystem, "src", utils.WalkJavaFile(&newStats, isJsonExist()))
 	if err != nil {

@@ -13,17 +13,14 @@ public class GamePanel extends JPanel {
 
   public void changeXDelta(int delta) {
     xDelta += delta;
-    repaint();
   }
   public void changeYDelta(int delta) {
     yDelta += delta;
-    repaint();
   }
 
   public void changePosition(int x, int y) {
     xDelta = x;
     yDelta = y;
-    repaint();
   }
 
   public GamePanel() {
