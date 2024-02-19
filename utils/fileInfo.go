@@ -7,32 +7,50 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
+
+	"github.com/google/uuid"
 )
 
 type FileStatStruct struct {
+	Id       uuid.UUID
 	Name     string
 	Size     int64
-	ModeTime time.Time
+	ModeTime string
 }
 
-func HandleFile(fileStats *[]FileStatStruct) fs.WalkDirFunc {
+func WalkJavaFile(fileStats *[]FileStatStruct, jsonExist bool) fs.WalkDirFunc {
+
+	if !jsonExist {
+
+		return func(path string, d fs.DirEntry, err error) error {
+			err = SkipGit(d.Name())
+			if err == fs.SkipDir {
+				return err
+			}
+
+			if strings.Contains(path, ".java") {
+				SaveFileStat(path, fileStats)
+			}
+			return nil
+		}
+	}
+
+	oldStats := UnmarshalJavaJsonFile()
 
 	return func(path string, d fs.DirEntry, err error) error {
-		err = skipGit(d.Name())
+		err = SkipGit(d.Name())
 		if err == fs.SkipDir {
 			return err
 		}
 
 		if strings.Contains(path, ".java") {
-			fmt.Println(path)
-			SaveFileStat(path, fileStats)
+			UpdateFileStat(path, oldStats)
 		}
 		return nil
 	}
 }
 
-func skipGit(dir string) error {
+func SkipGit(dir string) error {
 	switch dir {
 	case ".git":
 		return fs.SkipDir
@@ -40,6 +58,36 @@ func skipGit(dir string) error {
 	return nil
 }
 
+func UpdateFileStat(path string, fileStats *[]FileStatStruct) {
+
+	newStat, err := os.Stat(path)
+	if err != nil {
+		fmt.Printf("function UpdateFileStat error :%v\n", err)
+		os.Exit(1)
+	}
+
+	time, err := newStat.ModTime().MarshalText()
+	if err != nil {
+		fmt.Printf("saveFileStat ModeTime : %v\n", err)
+		os.Exit(1)
+	}
+
+	data := FileStatStruct{Id: uuid.New(), Name: newStat.Name(), Size: newStat.Size(), ModeTime: string(time)}
+
+	*fileStats = append(*fileStats, data)
+}
+
+func UnmarshalJavaJsonFile() *[]FileStatStruct {
+	file, err := os.ReadFile("./fileInfo.json")
+	if err != nil {
+		fmt.Printf("function compileModified : %v\n", err)
+	}
+
+	fileStats := &[]FileStatStruct{}
+	json.Unmarshal(file, fileStats)
+	return fileStats
+
+}
 func SaveFileStat(path string, fileStats *[]FileStatStruct) {
 
 	fileStat, err := os.Stat(path)
@@ -48,7 +96,13 @@ func SaveFileStat(path string, fileStats *[]FileStatStruct) {
 		os.Exit(1)
 	}
 
-	data := FileStatStruct{Name: fileStat.Name(), Size: fileStat.Size(), ModeTime: fileStat.ModTime()}
+	time, err := fileStat.ModTime().MarshalText()
+	if err != nil {
+		fmt.Printf("saveFileStat ModeTime : %v\n", err)
+		os.Exit(1)
+	}
+
+	data := FileStatStruct{Id: uuid.New(), Name: fileStat.Name(), Size: fileStat.Size(), ModeTime: string(time)}
 
 	*fileStats = append(*fileStats, data)
 }
@@ -64,5 +118,4 @@ func WriteFileStat(fileStats []FileStatStruct) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
