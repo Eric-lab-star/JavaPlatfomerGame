@@ -1,62 +1,101 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/fs"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/eric-lab-star/platformerGame/utils"
+	"time"
 )
 
+var (
+	fileSystem fs.FS
+	root       string
+)
+
+func init() {
+
+	root, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fileSystem = os.DirFS(root)
+}
+
 func main() {
-	flag.Parse()
-	wd, err := os.Getwd()
-	if err != nil {
-		fmt.Printf("os.Getwd() from main function %v\n", err)
-	}
 
-	newStats := []utils.FileStatStruct{}
-	fileSystem := os.DirFS(wd)
+	fmt.Println("watching..")
+	fileWatchChan := make(chan string)
+	fileSystemWalker(fileWatchChan)
 
-	err = fs.WalkDir(fileSystem, "src", utils.WalkJavaFile(&newStats, isJsonExist()))
-	if err != nil {
-		fmt.Printf("walk dir err %v\n", err)
-		os.Exit(1)
-	}
-	utils.WriteFileStat(newStats)
-
-}
-
-func isJsonExist() bool {
-	_, err := os.Open("./fileInfo.json")
-	if err != nil {
-		return false
-	}
-	return true
-}
-
-func compile(path string) error {
-	var err error
-	fmt.Println(path)
-	cmd := exec.Command("javac", "-d", "build", "-cp", "src", path)
-	err = cmd.Run()
-	return err
-}
-
-func isModified(initStats []utils.FileStatStruct, newStats []utils.FileStatStruct) {
-
-	for _, init := range initStats {
-		for _, new := range newStats {
-			if strings.Compare(init.Id.String(), new.Id.String()) == 0 {
-				fmt.Println("file already exists")
-			} else {
-				fmt.Println("new file")
+	for {
+		select {
+		case f := <-fileWatchChan:
+			{
+				fmt.Println(f + " been changed")
+				javacompiler(f)
 			}
 		}
+	}
+}
 
+func fileSystemWalker(fileWatchChan chan string) {
+	fs.WalkDir(fileSystem, ".", func(path string, d fs.DirEntry, err error) error {
+		if strings.HasSuffix(path, ".java") {
+			go watcher(fileWatchChan, path)
+		}
+		return nil
+	})
+}
+
+func javacompiler(filename string) {
+	if strings.HasSuffix(filename, ".java") {
+		cmd := exec.Command("javac", "-d", "build", "-cp", "src", filename)
+		err := cmd.Run()
+		if err != nil {
+			fmt.Println("err", err)
+		}
+	}
+}
+
+// sizeAndTime struct  
+type sizeAndTime struct {
+	size int64
+	time time.Time
+}
+
+func watcher(w chan string, filename string) {
+	init := &sizeAndTime{}
+	for {
+		time.Sleep(500 * time.Millisecond)
+		fileStat := getFileStat(filename)
+		if didChange(init, fileStat) {
+			init = fileStat
+			w <- filename
+		}
+	}
+}
+
+func getFileStat(filename string) *sizeAndTime {
+
+	info, err := fs.Stat(fileSystem, filename)
+	if err != nil {
+		log.Fatal(err)
 	}
 
+	newStat := &sizeAndTime{
+		size: info.Size(),
+		time: info.ModTime(),
+	}
+	return newStat
+}
+
+func didChange(oldStat *sizeAndTime, newStat *sizeAndTime) bool {
+	if oldStat.size != newStat.size || oldStat.time != newStat.time {
+		return true
+	}
+	return false
 }
