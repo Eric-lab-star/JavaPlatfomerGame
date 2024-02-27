@@ -5,9 +5,6 @@ import java.awt.event.KeyListener;
 
 import main.GamePanel;
 
-/**
- * KeyboardInputs
- */
 public class KeyboardInputs implements KeyListener {
   private GamePanel gamePanel;
 

@@ -29,7 +29,8 @@ public class GamePanel extends JPanel {
     addMouseListener(mouseInput);
     addMouseMotionListener(mouseInput);
   }
-
+  // paintComponent is called by JPanel
+  // when the game starts
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     g.fillRect(xDelta, yDelta, 400, 100);
