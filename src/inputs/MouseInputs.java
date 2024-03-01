@@ -15,6 +15,7 @@ public class MouseInputs implements MouseListener, MouseMotionListener {
   public MouseInputs(GamePanel gamePanel) {
     this.gamePanel = gamePanel;
   }
+
   @Override
   public void mouseDragged(MouseEvent e) {
     // TODO Auto-generated method stub
