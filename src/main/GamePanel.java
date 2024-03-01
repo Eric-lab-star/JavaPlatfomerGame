@@ -1,6 +1,8 @@
 package main;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Random;
 
 import javax.swing.JPanel;
 
@@ -9,7 +11,10 @@ import inputs.MouseInputs;
 
 public class GamePanel extends JPanel {
   private MouseInputs mouseInput;
-  private int xDelta = 100, yDelta = 100;
+  private float xDelta = 360, yDelta = 200;
+  private float xDir = 0.3f, yDir = 0.3f;
+  private Color color = new Color(140, 20, 90);
+  private Random random = new Random();
 
   public void changeXDelta(int delta) {
     xDelta += delta;
@@ -33,6 +38,29 @@ public class GamePanel extends JPanel {
   // when the game starts
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
-    g.fillRect(xDelta, yDelta, 400, 100);
+    updateRectangle();
+    g.setColor(color);
+    g.fillRect((int) xDelta, (int) yDelta, 100, 100);
+  }
+
+  private void updateRectangle() {
+    xDelta += xDir;
+    if (xDelta < 0 || xDelta > 620) {
+      xDir *= -1;
+      color = getRndColor();
+    }
+    yDelta += yDir;
+    if (yDelta < 0 || yDelta > 270) {
+      yDir *= -1;
+      color = getRndColor();
+    }
+  }
+  private Color getRndColor() {
+    final int r, g, b;
+    r = random.nextInt(254);
+    g = random.nextInt(254);
+    b = random.nextInt(254);
+
+    return new Color(r, g, b);
   }
 }
