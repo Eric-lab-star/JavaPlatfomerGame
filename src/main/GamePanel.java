@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.Random;
 
@@ -30,9 +31,14 @@ public class GamePanel extends JPanel {
 
   public GamePanel() {
     mouseInput = new MouseInputs(this);
+    setPanelSize();
     addKeyListener(new KeyboardInputs(this));
     addMouseListener(mouseInput);
     addMouseMotionListener(mouseInput);
+  }
+  private void setPanelSize() {
+    Dimension size = new Dimension();
+    setPreferredSize(size);
   }
   // paintComponent is called by JPanel
   // when the game starts
