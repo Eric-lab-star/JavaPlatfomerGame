@@ -19,11 +19,6 @@ public class KeyboardInputs implements KeyListener {
 
   @Override
   public void keyPressed(KeyEvent e) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void keyReleased(KeyEvent e) {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_W:
         gamePanel.changeYDelta(-10);
@@ -41,4 +36,7 @@ public class KeyboardInputs implements KeyListener {
         break;
     }
   }
+
+  @Override
+  public void keyReleased(KeyEvent e) {}
 }

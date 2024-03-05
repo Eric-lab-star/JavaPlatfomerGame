@@ -1,21 +1,25 @@
 package main;
 
-import inputs.KeyboardInputs;
-import inputs.MouseInputs;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+
+import inputs.KeyboardInputs;
+import inputs.MouseInputs;
 
 public class GamePanel extends JPanel {
   private MouseInputs mouseInput;
   private float xDelta = 360, yDelta = 200;
   private BufferedImage img, subImg;
   private int imgW = 64, imgH = 40;
+  private BufferedImage defaultImg;
 
+  private int frame = 0;
   public GamePanel() {
     mouseInput = new MouseInputs(this);
     importImage();
@@ -31,7 +35,6 @@ public class GamePanel extends JPanel {
       InputStream is = getClass().getResourceAsStream("/res/player_sprites.png");
       img = ImageIO.read(is);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
@@ -57,7 +60,7 @@ public class GamePanel extends JPanel {
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
-    subImg = img.getSubimage(imgW, imgH * 8, imgW, imgH);
-    g.drawImage(subImg, 0, 0, imgW * 2, imgH * 2, null);
+    g.drawImage(img.getSubimage(imgW * frame, imgH * frame, imgW, imgH), (int) 0, (int) 0, imgW * 2,
+        imgH * 2, null);
   }
 }
