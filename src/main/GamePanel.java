@@ -1,5 +1,8 @@
 package main;
 
+import static utilz.Constants.PlayerConstants.GetSpriteAmount;
+import static utilz.Constants.PlayerConstants.IDLE;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -15,36 +18,44 @@ import inputs.MouseInputs;
 public class GamePanel extends JPanel {
   private MouseInputs mouseInput;
   private float xDelta = 360, yDelta = 200;
-  private BufferedImage img, subImg;
+  private BufferedImage img;
   private int imgW = 64, imgH = 40;
-  private BufferedImage defaultImg;
+  private BufferedImage[][] animations;
+  private int aniTick, aniIndex, aniSpeed = 20;
+  private int playerAction = IDLE;
 
-  private int frame = 0;
   public GamePanel() {
     mouseInput = new MouseInputs(this);
     importImage();
+    loadAnimations();
     setPanelSize();
     addKeyListener(new KeyboardInputs(this));
     addMouseListener(mouseInput);
     addMouseMotionListener(mouseInput);
   }
 
-  private void importImage() {
-    try {
-      System.out.println();
-      InputStream is = getClass().getResourceAsStream("/res/player_sprites.png");
-      img = ImageIO.read(is);
-    } catch (IOException e) {
-      e.printStackTrace();
+  private void loadAnimations() {
+    animations = new BufferedImage[9][6];
+    for (int j = 0; j < animations.length; j++) {
+      for (int i = 0; i < animations[j].length; i++) {
+        animations[j][i] = img.getSubimage(i * imgW, j * imgH, imgW, imgH);
+      }
     }
   }
 
-  public void changeXDelta(int delta) {
-    xDelta += delta;
-  }
-
-  public void changeYDelta(int delta) {
-    yDelta += delta;
+  private void importImage() {
+    InputStream is = getClass().getResourceAsStream("/res/player_sprites.png");
+    try {
+      img = ImageIO.read(is);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        is.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   public void changePosition(int x, int y) {
@@ -57,10 +68,21 @@ public class GamePanel extends JPanel {
     setPreferredSize(size);
   }
 
+  private void updateAnimationTick() {
+    aniTick++;
+    if (aniTick >= aniSpeed) {
+      aniTick = 0;
+      aniIndex++;
+      if (aniIndex >= GetSpriteAmount(playerAction)) {
+        aniIndex = 0;
+      }
+    }
+  }
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
-    g.drawImage(img.getSubimage(imgW * frame, imgH * frame, imgW, imgH), (int) 0, (int) 0, imgW * 2,
-        imgH * 2, null);
+    updateAnimationTick();
+    g.drawImage(
+        animations[playerAction][aniIndex], (int) xDelta, (int) yDelta, imgW * 3, imgH * 3, null);
   }
 }
