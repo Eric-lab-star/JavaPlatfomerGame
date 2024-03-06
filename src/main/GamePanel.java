@@ -1,7 +1,12 @@
 package main;
 
+import static utilz.Constants.Directions.DOWN;
+import static utilz.Constants.Directions.LEFT;
+import static utilz.Constants.Directions.RIGHT;
+import static utilz.Constants.Directions.UP;
 import static utilz.Constants.PlayerConstants.GetSpriteAmount;
 import static utilz.Constants.PlayerConstants.IDLE;
+import static utilz.Constants.PlayerConstants.RUNNING;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -21,8 +26,11 @@ public class GamePanel extends JPanel {
   private BufferedImage img;
   private int imgW = 64, imgH = 40;
   private BufferedImage[][] animations;
+
   private int aniTick, aniIndex, aniSpeed = 20;
   private int playerAction = IDLE;
+  private int playerDir = -1;
+  private boolean moving = false;
 
   public GamePanel() {
     mouseInput = new MouseInputs(this);
@@ -58,14 +66,26 @@ public class GamePanel extends JPanel {
     }
   }
 
-  public void changePosition(int x, int y) {
-    xDelta = x;
-    yDelta = y;
-  }
-
   private void setPanelSize() {
     Dimension size = new Dimension(1280, 808);
     setPreferredSize(size);
+  }
+
+  public void setDirection(int dir) {
+    this.playerDir = dir;
+    moving = true;
+  }
+
+  public void setMoving(boolean moving) {
+    this.moving = moving;
+  }
+
+  private void setAnimation() {
+    if (moving) {
+      playerAction = RUNNING;
+    } else {
+      playerAction = IDLE;
+    }
   }
 
   private void updateAnimationTick() {
@@ -78,10 +98,32 @@ public class GamePanel extends JPanel {
       }
     }
   }
+
+  private void updatePosition() {
+    if (moving) {
+      switch (playerDir) {
+        case LEFT:
+          xDelta -= 5;
+          break;
+        case UP:
+          yDelta -= 5;
+          break;
+        case RIGHT:
+          xDelta += 5;
+          break;
+        case DOWN:
+          yDelta += 5;
+          break;
+      }
+    }
+  }
+
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     updateAnimationTick();
+    setAnimation();
+    updatePosition();
     g.drawImage(
         animations[playerAction][aniIndex], (int) xDelta, (int) yDelta, imgW * 3, imgH * 3, null);
   }
