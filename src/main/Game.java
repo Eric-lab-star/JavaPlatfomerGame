@@ -19,13 +19,16 @@ public class Game implements Runnable {
     gameThread.start();
   }
 
+  private void update() {
+    gamePanel.updateGame();
+  }
+
   @Override
   public void run() {
     final double nanoSeconds = 1000000000.0;
 
     double timePerFrame = nanoSeconds / FPS_SET;
-    double timerPerUpdate = nanoSeconds / UPS_SET;
-    long lastTime = System.nanoTime();
+    double timePerUpdate = nanoSeconds / UPS_SET;
     long previousTime = System.nanoTime();
 
     int frames = 0;
@@ -33,23 +36,24 @@ public class Game implements Runnable {
     long lastCheck = System.currentTimeMillis();
 
     double deltaU = 0;
+    double deltaF = 0;
 
     while (true) {
-      long now = System.nanoTime();
       long currentTime = System.nanoTime();
 
-      deltaU += (currentTime - previousTime) / timerPerUpdate;
+      deltaU += (currentTime - previousTime) / timePerUpdate;
+      deltaF += (currentTime - previousTime) / timePerFrame;
       previousTime = currentTime;
 
       if (deltaU >= 1) {
-        // update();
+        update();
         deltaU--;
         updates++;
       }
 
-      if (now - lastTime >= timePerFrame) {
+      if (deltaF >= 1) {
         gamePanel.repaint();
-        lastTime = now;
+        deltaF--;
         frames++;
       }
 

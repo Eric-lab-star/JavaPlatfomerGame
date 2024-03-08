@@ -8,17 +8,15 @@ import static utilz.Constants.PlayerConstants.GetSpriteAmount;
 import static utilz.Constants.PlayerConstants.IDLE;
 import static utilz.Constants.PlayerConstants.RUNNING;
 
+import inputs.KeyboardInputs;
+import inputs.MouseInputs;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
-
-import inputs.KeyboardInputs;
-import inputs.MouseInputs;
 
 public class GamePanel extends JPanel {
   private MouseInputs mouseInput;
@@ -118,12 +116,15 @@ public class GamePanel extends JPanel {
     }
   }
 
-  @Override
-  public void paintComponent(Graphics g) {
-    super.paintComponent(g);
+  public void updateGame() {
     updateAnimationTick();
     setAnimation();
     updatePosition();
+  }
+
+  @Override
+  public void paintComponent(Graphics g) {
+    super.paintComponent(g);
     g.drawImage(
         animations[playerAction][aniIndex], (int) xDelta, (int) yDelta, imgW * 3, imgH * 3, null);
   }
