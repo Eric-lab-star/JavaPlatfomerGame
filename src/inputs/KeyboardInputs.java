@@ -1,10 +1,5 @@
 package inputs;
 
-import static utilz.Constants.Directions.DOWN;
-import static utilz.Constants.Directions.LEFT;
-import static utilz.Constants.Directions.RIGHT;
-import static utilz.Constants.Directions.UP;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -27,18 +22,16 @@ public class KeyboardInputs implements KeyListener {
   public void keyPressed(KeyEvent e) {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_W:
-        player.setDirection(UP);
+        player.setUp(true);
         break;
       case KeyEvent.VK_A:
-        player.setDirection(LEFT);
+        player.setLeft(true);
         break;
       case KeyEvent.VK_S:
-        player.setDirection(DOWN);
+        player.setDown(true);
         break;
       case KeyEvent.VK_D:
-        player.setDirection(RIGHT);
-        break;
-      default:
+        player.setRight(true);
         break;
     }
   }
@@ -47,10 +40,16 @@ public class KeyboardInputs implements KeyListener {
   public void keyReleased(KeyEvent e) {
     switch (e.getKeyCode()) {
       case KeyEvent.VK_W:
+        player.setUp(false);
+        break;
       case KeyEvent.VK_A:
+        player.setLeft(false);
+        break;
       case KeyEvent.VK_S:
+        player.setDown(false);
+        break;
       case KeyEvent.VK_D:
-        player.setMoving(false);
+        player.setRight(false);
         break;
     }
   }

@@ -39,4 +39,8 @@ public class GamePanel extends JPanel {
   public Player getPlayer() {
     return player;
   }
+
+  public void windowFocusLost() {
+    player.resetDir();
+  }
 }

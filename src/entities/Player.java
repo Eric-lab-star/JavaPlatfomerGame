@@ -7,7 +7,6 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-import utilz.Constants.Directions;
 import utilz.Constants.PlayerConstants;
 
 public class Player extends Entity {
@@ -16,8 +15,41 @@ public class Player extends Entity {
   private int imgW = 64, imgH = 40;
   private int aniTick, aniIndex, aniSpeed = 20;
   private PlayerConstants playerAction = PlayerConstants.IDLE;
-  private Directions playerDir = Directions.RIGHT;
-  private boolean moving = false;
+  private boolean moving = false, attacking = false;
+  private boolean right, left, down, up;
+  private float playerSpeed = 2.0f;
+
+  public boolean isUp() {
+    return up;
+  }
+
+  public void setUp(boolean up) {
+    this.up = up;
+  }
+
+  public boolean isDown() {
+    return down;
+  }
+
+  public void setDown(boolean down) {
+    this.down = down;
+  }
+
+  public boolean isLeft() {
+    return left;
+  }
+
+  public void setLeft(boolean left) {
+    this.left = left;
+  }
+
+  public boolean isRight() {
+    return right;
+  }
+
+  public void setRight(boolean right) {
+    this.right = right;
+  }
 
   public Player(float x, float y) {
     super(x, y);
@@ -52,9 +84,9 @@ public class Player extends Entity {
   }
 
   public void update() {
-    updateAnimationTick();
-    setAnimation();
     updatePosition();
+    setAnimation();
+    updateAnimationTick();
   }
 
   private void updateAnimationTick() {
@@ -64,34 +96,51 @@ public class Player extends Entity {
       aniIndex++;
       if (aniIndex + 1 > playerAction.GetSpriteAmount()) {
         aniIndex = 0;
+        attacking = false;
       }
     }
   }
 
   private void setAnimation() {
+    PlayerConstants startAni = playerAction;
+
     if (moving) {
       playerAction = PlayerConstants.RUNNING;
     } else {
       playerAction = PlayerConstants.IDLE;
     }
+
+    if (attacking) {
+      playerAction = PlayerConstants.ATTACK_1;
+    }
+
+    if (startAni != playerAction) {
+      resetAniTick();
+    }
+  }
+
+  private void resetAniTick() {
+    aniIndex = 0;
+    aniTick = 0;
   }
 
   private void updatePosition() {
-    if (moving) {
-      switch (playerDir) {
-        case LEFT:
-          this.x -= 1;
-          break;
-        case UP:
-          this.y -= 1;
-          break;
-        case RIGHT:
-          this.x += 1;
-          break;
-        case DOWN:
-          this.y += 1;
-          break;
-      }
+    moving = false;
+
+    if (left && !right) {
+      x -= playerSpeed;
+      moving = true;
+    } else if (!left && right) {
+      x += playerSpeed;
+      moving = true;
+    }
+
+    if (up && !down) {
+      y -= playerSpeed;
+      moving = true;
+    } else if (!up && down) {
+      y += playerSpeed;
+      moving = true;
     }
   }
 
@@ -101,12 +150,14 @@ public class Player extends Entity {
     g.drawImage(subImg, (int) this.x, (int) this.y, imgW * 3, imgH * 3, null);
   }
 
-  public void setDirection(Directions dir) {
-    this.playerDir = dir;
-    moving = true;
+  public void resetDir() {
+    left = false;
+    right = false;
+    down = false;
+    up = false;
   }
 
-  public void setMoving(boolean moving) {
-    this.moving = moving;
+  public void setAttacking(boolean attacking) {
+    this.attacking = attacking;
   }
 }

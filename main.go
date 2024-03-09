@@ -70,7 +70,7 @@ type sizeAndTime struct {
 func watcher(w chan string, filename string) {
 	init := &sizeAndTime{}
 	for {
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 		fileStat := getFileStat(filename)
 		if didChange(init, fileStat) {
 			init = fileStat
