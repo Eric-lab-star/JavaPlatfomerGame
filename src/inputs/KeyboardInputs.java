@@ -26,12 +26,14 @@ public class KeyboardInputs implements KeyListener {
         break;
       case KeyEvent.VK_A:
         player.setLeft(true);
+        player.setLastKeyEvent(KeyEvent.VK_A);
         break;
       case KeyEvent.VK_S:
         player.setDown(true);
         break;
       case KeyEvent.VK_D:
         player.setRight(true);
+        player.setLastKeyEvent(KeyEvent.VK_D);
         break;
     }
   }

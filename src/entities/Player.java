@@ -1,6 +1,9 @@
 package entities;
 
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,13 +14,14 @@ import utilz.Constants.PlayerConstants;
 
 public class Player extends Entity {
   private BufferedImage[][] animations;
-  private BufferedImage img;
+  private BufferedImage img, subImg;
   private int imgW = 64, imgH = 40;
   private int aniTick, aniIndex, aniSpeed = 20;
   private PlayerConstants playerAction = PlayerConstants.IDLE;
   private boolean moving = false, attacking = false;
   private boolean right, left, down, up;
   private float playerSpeed = 2.0f;
+  private int lastKeyEvent;
 
   public boolean isUp() {
     return up;
@@ -74,7 +78,6 @@ public class Player extends Entity {
 
   private void loadAnimations() {
     animations = new BufferedImage[PlayerConstants.values().length][];
-
     for (PlayerConstants p : PlayerConstants.values()) {
       animations[p.ordinal()] = new BufferedImage[p.GetSpriteAmount()];
       for (int i = 0; i < p.GetSpriteAmount(); i++) {
@@ -94,6 +97,7 @@ public class Player extends Entity {
     if (aniTick >= aniSpeed) {
       aniTick = 0;
       aniIndex++;
+
       if (aniIndex + 1 > playerAction.GetSpriteAmount()) {
         aniIndex = 0;
         attacking = false;
@@ -143,11 +147,33 @@ public class Player extends Entity {
       moving = true;
     }
   }
+  public void flipHorizontal() {
+    AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+    tx.translate(-subImg.getWidth(), 0);
+    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    subImg = op.filter(subImg, null);
+  }
+  public void flipVertical() {
+    AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
+    tx.translate(0, -subImg.getHeight(null));
+    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+    subImg = op.filter(subImg, null);
+  }
+
+  public void setLastKeyEvent(int key) {
+    this.lastKeyEvent = key;
+  }
 
   public void render(Graphics g) {
     int action = playerAction.ordinal();
-    BufferedImage subImg = animations[action][aniIndex];
-    g.drawImage(subImg, (int) this.x, (int) this.y, imgW * 3, imgH * 3, null);
+    subImg = animations[action][aniIndex];
+
+    if (lastKeyEvent == KeyEvent.VK_A) {
+      flipHorizontal();
+    }
+
+    g.drawImage(
+        subImg, (int) this.x, (int) this.y, subImg.getWidth() * 3, subImg.getHeight() * 3, null);
   }
 
   public void resetDir() {

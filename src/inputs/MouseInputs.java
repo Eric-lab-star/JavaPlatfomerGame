@@ -12,10 +12,8 @@ import main.GamePanel;
  * MouseInputs
  */
 public class MouseInputs implements MouseListener, MouseMotionListener {
-  private GamePanel gamePanel;
   private Player player;
   public MouseInputs(GamePanel gamePanel) {
-    this.gamePanel = gamePanel;
     this.player = gamePanel.getPlayer();
   }
 
