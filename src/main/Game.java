@@ -1,15 +1,22 @@
 package main;
 
 public class Game implements Runnable {
-  private GameWindow gameWindow;
   private GamePanel gamePanel;
   private Thread gameThread;
   private final int FPS_SET = 120;
   private final int UPS_SET = 200;
 
+  public static final int TILE_DEFAULT_SIZE = 32;
+  public static final float SCALE = 1.5f;
+  public static final int TILES_IN_WIDTH = 26;
+  public static final int TILES_IN_HEIGHT = 14;
+  public final static int TILES_SIZE = (int) (TILE_DEFAULT_SIZE * SCALE);
+  public final static int GAME_WIDTH = TILES_IN_WIDTH * TILES_SIZE;
+  public final static int GAME_HEIGHT = TILES_IN_HEIGHT * TILES_SIZE;
+
   public Game() {
     gamePanel = new GamePanel();
-    gameWindow = new GameWindow(gamePanel);
+    new GameWindow(gamePanel);
     gamePanel.requestFocus();
     startGameLoop();
   }

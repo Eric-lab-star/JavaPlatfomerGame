@@ -5,12 +5,9 @@ import java.awt.event.KeyEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
 
 import utilz.Constants.PlayerConstants;
+import utilz.LoadSave;
 
 public class Player extends Entity {
   private BufferedImage[][] animations;
@@ -57,26 +54,11 @@ public class Player extends Entity {
 
   public Player(float x, float y) {
     super(x, y);
-    importImage();
     loadAnimations();
   }
 
-  private void importImage() {
-    InputStream is = getClass().getResourceAsStream("/res/player_sprites.png");
-    try {
-      img = ImageIO.read(is);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        is.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-  }
-
   private void loadAnimations() {
+    img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
     animations = new BufferedImage[PlayerConstants.values().length][];
     for (PlayerConstants p : PlayerConstants.values()) {
       animations[p.ordinal()] = new BufferedImage[p.GetSpriteAmount()];
@@ -173,7 +155,7 @@ public class Player extends Entity {
     }
 
     g.drawImage(
-        subImg, (int) this.x, (int) this.y, subImg.getWidth() * 3, subImg.getHeight() * 3, null);
+        subImg, (int) this.x, (int) this.y, subImg.getWidth() * 2, subImg.getHeight() * 2, null);
   }
 
   public void resetDir() {

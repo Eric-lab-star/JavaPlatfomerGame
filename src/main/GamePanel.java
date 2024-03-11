@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import entities.Player;
 import inputs.KeyboardInputs;
 import inputs.MouseInputs;
-
 public class GamePanel extends JPanel {
   private MouseInputs mouseInput;
   private static Player player = new Player(30, 200);
@@ -22,7 +21,7 @@ public class GamePanel extends JPanel {
   }
 
   private void setPanelSize() {
-    Dimension size = new Dimension(1280, 808);
+    Dimension size = new Dimension(Game.GAME_WIDTH, Game.GAME_HEIGHT);
     setPreferredSize(size);
   }
 
