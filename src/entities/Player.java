@@ -2,11 +2,10 @@ package entities;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import utilz.Constants.PlayerConstants;
+import utilz.Image;
 import utilz.LoadSave;
 
 public class Player extends Entity {
@@ -59,6 +58,7 @@ public class Player extends Entity {
 
   private void loadAnimations() {
     img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
+
     animations = new BufferedImage[PlayerConstants.values().length][];
     for (PlayerConstants p : PlayerConstants.values()) {
       animations[p.ordinal()] = new BufferedImage[p.GetSpriteAmount()];
@@ -129,18 +129,6 @@ public class Player extends Entity {
       moving = true;
     }
   }
-  public void flipHorizontal() {
-    AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-    tx.translate(-subImg.getWidth(), 0);
-    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-    subImg = op.filter(subImg, null);
-  }
-  public void flipVertical() {
-    AffineTransform tx = AffineTransform.getScaleInstance(1, -1);
-    tx.translate(0, -subImg.getHeight(null));
-    AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-    subImg = op.filter(subImg, null);
-  }
 
   public void setLastKeyEvent(int key) {
     this.lastKeyEvent = key;
@@ -151,7 +139,7 @@ public class Player extends Entity {
     subImg = animations[action][aniIndex];
 
     if (lastKeyEvent == KeyEvent.VK_A) {
-      flipHorizontal();
+      subImg = Image.FlipHorizontal(subImg);
     }
 
     g.drawImage(
