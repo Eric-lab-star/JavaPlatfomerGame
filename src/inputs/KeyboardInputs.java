@@ -7,11 +7,9 @@ import entities.Player;
 import main.GamePanel;
 
 public class KeyboardInputs implements KeyListener {
-  private GamePanel gamePanel;
   private Player player;
 
   public KeyboardInputs(GamePanel gamePanel) {
-    this.gamePanel = gamePanel;
     this.player = gamePanel.getGame().getPlayer();
   }
 

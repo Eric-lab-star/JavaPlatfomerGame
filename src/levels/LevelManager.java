@@ -12,10 +12,8 @@ import utilz.LoadSave;
 public class LevelManager {
   private BufferedImage[] levelSprite;
   private Level levelOne;
-  private Game game;
 
   public LevelManager(Game game) {
-    this.game = game;
     importOutSideSprites();
     levelOne = new Level(LoadSave.GetLevelData());
   }
@@ -42,4 +40,8 @@ public class LevelManager {
   }
 
   public void update() {}
+
+  public Level getCurrentLevel() {
+    return levelOne;
+  }
 }

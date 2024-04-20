@@ -18,6 +18,12 @@ public class Player extends Entity {
   private boolean right, left, down, up;
   private float playerSpeed = 2.0f;
   private int lastKeyEvent;
+  private int[][] lvlData;
+
+  public Player(float x, float y, int width, int height) {
+    super(x, y, width, height);
+    loadAnimations();
+  }
 
   public boolean isUp() {
     return up;
@@ -51,11 +57,6 @@ public class Player extends Entity {
     this.right = right;
   }
 
-  public Player(float x, float y, int width, int height) {
-    super(x, y, width, height);
-    loadAnimations();
-  }
-
   private void loadAnimations() {
     img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
 
@@ -66,12 +67,6 @@ public class Player extends Entity {
         animations[p.ordinal()][i] = img.getSubimage(i * imgW, p.ordinal() * imgH, imgW, imgH);
       }
     }
-  }
-
-  public void update() {
-    updatePosition();
-    setAnimation();
-    updateAnimationTick();
   }
 
   private void updateAnimationTick() {
@@ -103,6 +98,17 @@ public class Player extends Entity {
     if (startAni != playerAction) {
       resetAniTick();
     }
+  }
+
+  public void loadLvlData(int[][] lvlData) {
+    this.lvlData = lvlData;
+  }
+
+  public void update() {
+    updatePosition();
+    updateHitbox();
+    setAnimation();
+    updateAnimationTick();
   }
 
   public void resetDirBooleans() {
@@ -151,6 +157,7 @@ public class Player extends Entity {
 
     g.drawImage(
         subImg, (int) this.x, (int) this.y, subImg.getWidth() * 2, subImg.getHeight() * 2, null);
+    drawHitbox(g);
   }
 
   public void resetDir() {
