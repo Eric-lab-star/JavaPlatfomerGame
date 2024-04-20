@@ -5,15 +5,16 @@ import java.awt.Graphics;
 
 import javax.swing.JPanel;
 
-import entities.Player;
 import inputs.KeyboardInputs;
 import inputs.MouseInputs;
+
 public class GamePanel extends JPanel {
   private MouseInputs mouseInput;
-  private static Player player = new Player(30, 200);
+  private Game game;
 
-  public GamePanel() {
+  public GamePanel(Game game) {
     mouseInput = new MouseInputs(this);
+    this.game = game;
     setPanelSize();
     addKeyListener(new KeyboardInputs(this));
     addMouseListener(mouseInput);
@@ -25,21 +26,14 @@ public class GamePanel extends JPanel {
     setPreferredSize(size);
   }
 
-  public void updateGame() {
-    player.update();
-  }
+  public void updateGame() {}
 
   @Override
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
-    player.render(g);
+    game.render(g);
   }
-
-  public Player getPlayer() {
-    return player;
-  }
-
-  public void windowFocusLost() {
-    player.resetDir();
+  public Game getGame() {
+    return game;
   }
 }

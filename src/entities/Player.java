@@ -51,8 +51,8 @@ public class Player extends Entity {
     this.right = right;
   }
 
-  public Player(float x, float y) {
-    super(x, y);
+  public Player(float x, float y, int width, int height) {
+    super(x, y, width, height);
     loadAnimations();
   }
 
@@ -103,6 +103,13 @@ public class Player extends Entity {
     if (startAni != playerAction) {
       resetAniTick();
     }
+  }
+
+  public void resetDirBooleans() {
+    left = false;
+    right = false;
+    down = false;
+    up = false;
   }
 
   private void resetAniTick() {
