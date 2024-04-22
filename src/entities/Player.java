@@ -1,9 +1,12 @@
 package entities;
 
+import static utilz.HelpMethods.CanMoveHere;
+
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
+import main.Game;
 import utilz.Constants.PlayerConstants;
 import utilz.Image;
 import utilz.LoadSave;
@@ -19,47 +22,17 @@ public class Player extends Entity {
   private float playerSpeed = 2.0f;
   private int lastKeyEvent;
   private int[][] lvlData;
+  private float xDrawOffset = 21 * Game.SCALE;
+  private float yDrawOffset = 4 * Game.SCALE;
 
   public Player(float x, float y, int width, int height) {
     super(x, y, width, height);
     loadAnimations();
-  }
-
-  public boolean isUp() {
-    return up;
-  }
-
-  public void setUp(boolean up) {
-    this.up = up;
-  }
-
-  public boolean isDown() {
-    return down;
-  }
-
-  public void setDown(boolean down) {
-    this.down = down;
-  }
-
-  public boolean isLeft() {
-    return left;
-  }
-
-  public void setLeft(boolean left) {
-    this.left = left;
-  }
-
-  public boolean isRight() {
-    return right;
-  }
-
-  public void setRight(boolean right) {
-    this.right = right;
+    initHitbox(x, y, 20 * Game.SCALE, 28 * Game.SCALE);
   }
 
   private void loadAnimations() {
     img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
-
     animations = new BufferedImage[PlayerConstants.values().length][];
     for (PlayerConstants p : PlayerConstants.values()) {
       animations[p.ordinal()] = new BufferedImage[p.GetSpriteAmount()];
@@ -106,7 +79,6 @@ public class Player extends Entity {
 
   public void update() {
     updatePosition();
-    updateHitbox();
     setAnimation();
     updateAnimationTick();
   }
@@ -126,19 +98,28 @@ public class Player extends Entity {
   private void updatePosition() {
     moving = false;
 
+    if (!left && !right && !up && !down) {
+      return;
+    }
+
+    float xSpeed = 0;
+    float ySpeed = 0;
+
     if (left && !right) {
-      x -= playerSpeed;
-      moving = true;
+      xSpeed -= playerSpeed;
     } else if (!left && right) {
-      x += playerSpeed;
-      moving = true;
+      xSpeed += playerSpeed;
     }
 
     if (up && !down) {
-      y -= playerSpeed;
-      moving = true;
+      ySpeed -= playerSpeed;
     } else if (!up && down) {
-      y += playerSpeed;
+      ySpeed += playerSpeed;
+    }
+
+    if (CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, lvlData)) {
+      hitbox.x += xSpeed;
+      hitbox.y += ySpeed;
       moving = true;
     }
   }
@@ -155,8 +136,8 @@ public class Player extends Entity {
       subImg = Image.FlipHorizontal(subImg);
     }
 
-    g.drawImage(
-        subImg, (int) this.x, (int) this.y, subImg.getWidth() * 2, subImg.getHeight() * 2, null);
+    g.drawImage(subImg, (int) (hitbox.x - xDrawOffset), (int) (hitbox.y - yDrawOffset),
+        subImg.getWidth() * 2, subImg.getHeight() * 2, null);
     drawHitbox(g);
   }
 
@@ -169,5 +150,37 @@ public class Player extends Entity {
 
   public void setAttacking(boolean attacking) {
     this.attacking = attacking;
+  }
+
+  public boolean isUp() {
+    return up;
+  }
+
+  public void setUp(boolean up) {
+    this.up = up;
+  }
+
+  public boolean isDown() {
+    return down;
+  }
+
+  public void setDown(boolean down) {
+    this.down = down;
+  }
+
+  public boolean isLeft() {
+    return left;
+  }
+
+  public void setLeft(boolean left) {
+    this.left = left;
+  }
+
+  public boolean isRight() {
+    return right;
+  }
+
+  public void setRight(boolean right) {
+    this.right = right;
   }
 }
