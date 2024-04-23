@@ -1,6 +1,9 @@
 package entities;
 
 import static utilz.HelpMethods.CanMoveHere;
+import static utilz.HelpMethods.GetEntityXPosNextToWall;
+import static utilz.HelpMethods.GetEntityYPosUnderRoofOrAboveFloor;
+import static utilz.HelpMethods.IsEntityOnFloor;
 
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -18,17 +21,24 @@ public class Player extends Entity {
   private int aniTick, aniIndex, aniSpeed = 20;
   private PlayerConstants playerAction = PlayerConstants.IDLE;
   private boolean moving = false, attacking = false;
-  private boolean right, left, down, up;
+  private boolean right, left, down, up, jump;
   private float playerSpeed = 2.0f;
   private int lastKeyEvent;
   private int[][] lvlData;
   private float xDrawOffset = 21 * Game.SCALE;
   private float yDrawOffset = 4 * Game.SCALE;
 
+  // jumpin / gravity
+  private float airSpeed = 0f;
+  private float gravity = 0.04f * Game.SCALE;
+  private float jumpspeed = -2.25f * Game.SCALE;
+  private float fallSpeedAfterCollision = 0.5f * Game.SCALE;
+  private boolean inAir = false;
+
   public Player(float x, float y, int width, int height) {
     super(x, y, width, height);
     loadAnimations();
-    initHitbox(x, y, 20 * Game.SCALE, 28 * Game.SCALE);
+    initHitbox(x, y, 20 * Game.SCALE, 27 * Game.SCALE);
   }
 
   private void loadAnimations() {
@@ -64,6 +74,14 @@ public class Player extends Entity {
       playerAction = PlayerConstants.IDLE;
     }
 
+    if (inAir) {
+      if (airSpeed < 0) {
+        playerAction = PlayerConstants.JUMP;
+      } else {
+        playerAction = PlayerConstants.FALLING;
+      }
+    }
+
     if (attacking) {
       playerAction = PlayerConstants.ATTACK_1;
     }
@@ -75,6 +93,9 @@ public class Player extends Entity {
 
   public void loadLvlData(int[][] lvlData) {
     this.lvlData = lvlData;
+    if (!IsEntityOnFloor(hitbox, lvlData)) {
+      inAir = true;
+    }
   }
 
   public void update() {
@@ -97,30 +118,67 @@ public class Player extends Entity {
 
   private void updatePosition() {
     moving = false;
+    if (jump) {
+      jump();
+    }
 
-    if (!left && !right && !up && !down) {
+    if (!left && !right && !inAir) {
       return;
     }
 
     float xSpeed = 0;
-    float ySpeed = 0;
 
-    if (left && !right) {
+    if (left) {
       xSpeed -= playerSpeed;
-    } else if (!left && right) {
+    }
+    if (right) {
       xSpeed += playerSpeed;
     }
-
-    if (up && !down) {
-      ySpeed -= playerSpeed;
-    } else if (!up && down) {
-      ySpeed += playerSpeed;
+    if (!inAir) {
+      if (!IsEntityOnFloor(hitbox, lvlData)) {
+        inAir = true;
+      }
     }
 
-    if (CanMoveHere(hitbox.x + xSpeed, hitbox.y + ySpeed, hitbox.width, hitbox.height, lvlData)) {
+    if (inAir) {
+      if (CanMoveHere(hitbox.x, hitbox.y + airSpeed, hitbox.width, hitbox.height, lvlData)) {
+        hitbox.y += airSpeed;
+        airSpeed += gravity;
+        updateXPos(xSpeed);
+      } else {
+        hitbox.y = GetEntityYPosUnderRoofOrAboveFloor(hitbox, airSpeed);
+        if (airSpeed > 0) {
+          resetInAir();
+        } else {
+          airSpeed = fallSpeedAfterCollision;
+        }
+        updateXPos(xSpeed);
+      }
+    } else {
+      updateXPos(xSpeed);
+    }
+    moving = true;
+  }
+
+  private void jump() {
+    if (inAir) {
+      return;
+    } else {
+      inAir = true;
+      airSpeed = jumpspeed;
+    }
+  }
+
+  private void resetInAir() {
+    inAir = false;
+    airSpeed = 0;
+  }
+
+  private void updateXPos(float xSpeed) {
+    if (CanMoveHere(hitbox.x + xSpeed, hitbox.y, hitbox.width, hitbox.height, lvlData)) {
       hitbox.x += xSpeed;
-      hitbox.y += ySpeed;
-      moving = true;
+    } else {
+      hitbox.x = GetEntityXPosNextToWall(hitbox, xSpeed);
     }
   }
 
@@ -138,7 +196,6 @@ public class Player extends Entity {
 
     g.drawImage(subImg, (int) (hitbox.x - xDrawOffset), (int) (hitbox.y - yDrawOffset),
         subImg.getWidth() * 2, subImg.getHeight() * 2, null);
-    drawHitbox(g);
   }
 
   public void resetDir() {
@@ -182,5 +239,9 @@ public class Player extends Entity {
 
   public void setRight(boolean right) {
     this.right = right;
+  }
+
+  public void setJump(boolean jump) {
+    this.jump = jump;
   }
 }
