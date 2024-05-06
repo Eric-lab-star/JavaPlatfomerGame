@@ -17,14 +17,15 @@ public class MenuButton {
   private int xOffsetCenter = B_WIDTH / 2;
   private GameState state;
   private BufferedImage[] imgs;
-  private boolean mouseOver, mouseClick;
+  private boolean mouseOver, mousePressed;
   private Rectangle bounds;
 
-  public MenuButton(int xPos, int rowIndex, GameState gameState, int yPos) {
+  public MenuButton(int xPos, int yPos, int rowIndex, GameState gameState) {
     this.xPos = xPos;
     this.rowIndex = rowIndex;
     this.state = gameState;
     this.yPos = yPos;
+    this.index = 0;
     loadImgs();
     initBounds();
   }
@@ -37,9 +38,8 @@ public class MenuButton {
     imgs = new BufferedImage[3];
     BufferedImage tmp = LoadSave.GetSpriteAtlas(LoadSave.MENU_BUTTONS);
     for (int i = 0; i < imgs.length; i++) {
-      tmp.getSubimage(
+      imgs[i] = tmp.getSubimage(
           i * B_WIDTH_DEFAULT, rowIndex * B_HEIGHT_DEFAULT, B_WIDTH_DEFAULT, B_HEIGHT_DEFAULT);
-      imgs[i] = tmp;
     }
   }
   public void draw(Graphics g) {
@@ -51,17 +51,17 @@ public class MenuButton {
       index = 1;
     }
 
-    if (mouseClick) {
+    if (mousePressed) {
       index = 2;
     }
   }
 
-  public boolean isMouseClick() {
-    return mouseClick;
+  public boolean isMousePressed() {
+    return mousePressed;
   }
 
-  public void setMouseClick(boolean mouseClick) {
-    this.mouseClick = mouseClick;
+  public void setMousePressed(boolean mouseClick) {
+    this.mousePressed = mouseClick;
   }
 
   public boolean isMouseOver() {
@@ -76,6 +76,9 @@ public class MenuButton {
   }
   public void resetBools() {
     mouseOver = false;
-    mouseClick = false;
+    mousePressed = false;
+  }
+  public Rectangle getBounds() {
+    return bounds;
   }
 }
