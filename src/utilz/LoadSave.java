@@ -4,9 +4,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.imageio.ImageIO;
-
 import main.Game;
 
 public class LoadSave {
@@ -14,6 +12,7 @@ public class LoadSave {
   public static final String LEVEL_ATALAS = "outside_sprites.png";
   public static final String LEVEL_ONE_DATA = "level_one_data.png";
   public static final String MENU_BUTTONS = "button_atlas.png";
+  public static final String MENU_BACKGROUND = "menu_background.png";
 
   public static BufferedImage GetSpriteAtlas(String atlasName) {
     InputStream is = LoadSave.class.getResourceAsStream("/res/" + atlasName);
