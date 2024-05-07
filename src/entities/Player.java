@@ -8,7 +8,6 @@ import static utilz.HelpMethods.IsEntityOnFloor;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-
 import main.Game;
 import utilz.Constants.PlayerConstants;
 import utilz.Image;
@@ -22,7 +21,7 @@ public class Player extends Entity {
   private PlayerConstants playerAction = PlayerConstants.IDLE;
   private boolean moving = false, attacking = false;
   private boolean right, left, down, up, jump;
-  private float playerSpeed = 2.0f;
+  private float playerSpeed = 1.0f * Game.SCALE;
   private int lastKeyEvent;
   private int[][] lvlData;
   private float xDrawOffset = 21 * Game.SCALE;
@@ -38,7 +37,7 @@ public class Player extends Entity {
   public Player(float x, float y, int width, int height) {
     super(x, y, width, height);
     loadAnimations();
-    initHitbox(x, y, 20 * Game.SCALE, 27 * Game.SCALE);
+    initHitbox(x, y, (int) (20 * Game.SCALE), (int) (27 * Game.SCALE));
   }
 
   private void loadAnimations() {
